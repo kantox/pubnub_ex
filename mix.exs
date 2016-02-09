@@ -33,8 +33,8 @@ defmodule PubnubEx.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, github: "edgurgel/httpoison", tag: "master" },
-      {:exjsx, github: "talentdeficit/exjsx", tag: "master" }
+      {:httpoison, "~> 0.8.1" },
+      {:exjsx, "~> 3.2.0" }
     ]
   end
 
