@@ -6,10 +6,10 @@ defmodule PubnubEx.Publish do
   def publish(channel, msg) do
     config = PubnubEx.Record.create_config(channel)
     url = get_url(config, msg)
-    Logger.info(url)
+    Logger.debug "Publish Request URL : [" <> url  <> "]"
     {:ok, res} = HTTPoison.get(url, [], [timeout: :infinity, recv_timeout: :infinity])
-    Logger.info(inspect(res))
     %HTTPoison.Response{body: body, status_code: 200} = res
+    Logger.debug "Publish Response : " <> inspect(body)
     timetoken = case JSX.decode(body) do
       {:ok, [1, "Sent", timetoken]} ->
         timetoken
@@ -23,6 +23,6 @@ defmodule PubnubEx.Publish do
     callback = "0"
     schema <> "://" <> origin <> "/publish/" <> pubkey <> "/" <>subkey <> "/" <> signature <> "/" <> channel <> "/" <> callback <> "/" <> URI.encode(msg, &URI.char_unreserved?/1)
   end
-  defp get_schema(pubnub_config(ssl: true)= config), do: "https"
-  defp get_schema(pubnub_config(ssl: false)= config), do: "http"
+  defp get_schema(pubnub_config(ssl: true)= _config), do: "https"
+  defp get_schema(pubnub_config(ssl: false)= _config), do: "http"
 end

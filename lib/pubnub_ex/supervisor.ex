@@ -4,7 +4,6 @@ defmodule PubnubEx.Supervisor do
   use Supervisor
 
   def start_link() do
-    IO.puts "PubnubEx.Supervisor called."
     Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 

@@ -14,6 +14,11 @@ defmodule PubnubEx do
     :ok
   end
 
+  def create_config(channel) do
+    config = PubnubEx.Record.create_config(channel)
+  end
+
+  @spec subscribe(binary, pid) :: {atom, pid}
   def subscribe(channel, pid) do
     {:ok, subscribe_pid} = Supervisor.start_child(PubnubEx.Supervisor, [channel, pid])
     PubnubEx.Subscribe.start(subscribe_pid)

@@ -27,9 +27,7 @@ defmodule PubnubEx.Record do
   end
 
   def get_pubkey(pubnub_config(pubkey: key)), do: key
-
   def get_subkey(pubnub_config(subkey: key)), do: key
-
 
   defrecord :sub_state, pid: nil, monitor_client: nil, pubnub_config: nil
   def create_state(pid, pubnub_config()=config), do: sub_state(pid: pid, pubnub_config: config)

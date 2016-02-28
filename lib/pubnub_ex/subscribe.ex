@@ -16,13 +16,15 @@ defmodule PubnubEx.Subscribe do
   end
 
   def handle_cast(:start, sub_state(pid: pid, pubnub_config: pubnub_config)=state) do
-    Logger.info inspect(state)
+    pubnub_config(channel: channel)=pubnub_config
+    Logger.info "Subscribe start channel '#{channel}'."
     spawn_result = spawn_monitor(__MODULE__, :request, [pubnub_config, pid, 0])
     state = PubnubEx.Record.set_monitor_client(state, spawn_result)
     {:noreply, state}
   end
-  def handle_cast(msg, state) do
-    IO.puts "Unknow handle cast event."
+
+  def handle_cast(_msg, state) do
+    Logger.error "Unknow handle cast event."
     {:noreply, state}
   end
 
@@ -31,8 +33,8 @@ defmodule PubnubEx.Subscribe do
     {:noreply, state}
   end
 
-  def handle_info(msg, sub_state(pid: pid) = state) do
-    IO.puts "Unknown handle info #{inspect(msg)}"
+  def handle_info(msg, state) do
+    Logger.error "Unknown handle info #{inspect(msg)}"
     {:noreply, state}
   end
 
@@ -40,26 +42,29 @@ defmodule PubnubEx.Subscribe do
     GenServer.cast pid, :start
   end
 
-  def request(pubnub_config()=config, pid, timetoken) do
+  def request(pubnub_config(channel: channel)=config, pid, timetoken) do
     url = get_url(config, timetoken)
-    Logger.info url
+    Logger.info "Subscribe channel '#{channel}' with timetoken[#{timetoken}]"
+    Logger.debug "Subscribe Request URL [" <> url <> "]"
     {:ok, res} = HTTPoison.get(url, [], [timeout: :infinity, recv_timeout: :infinity])
     %HTTPoison.Response{body: body, status_code: 200} = res
-    Logger.info inspect(body)
-    timetoken = case JSX.decode(body) do
-      {:ok, [[], timetoken]} ->
-        timetoken
-      {:ok, [[msg], timetoken]} ->
+    Logger.debug "Subscribe Response : " <> inspect(body)
+    new_timetoken = case JSX.decode(body) do
+      {:ok, [[], new_timetoken]} ->
+        Logger.info "Subscribed channel '#{channel}' with timetoken[#{timetoken}]"
+        send(pid,{:subscribed, channel, timetoken})
+        new_timetoken
+      {:ok, [[msg], new_timetoken]} ->
         send(pid,msg)
-        timetoken
+        new_timetoken
     end
-    request(config, pid, timetoken)
+    request(config, pid, new_timetoken)
   end
 
   defp get_url(pubnub_config(origin: origin, subkey: subkey, channel: channel)=config, timetoken) do
     schema = get_schema(config)
     schema <> "://" <> origin <> "/subscribe/" <> subkey <> "/" <> channel <> "/0/" <> to_string(timetoken)
   end
-  defp get_schema(pubnub_config(ssl: true)= config), do: "https"
-  defp get_schema(pubnub_config(ssl: false)= config), do: "http"
+  defp get_schema(pubnub_config(ssl: true)= _config), do: "https"
+  defp get_schema(pubnub_config(ssl: false)= _config), do: "http"
 end
