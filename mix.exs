@@ -4,7 +4,7 @@ defmodule PubnubEx.Mixfile do
   def project do
     [app: :pubnub_ex,
      version: "0.0.2",
-     elixir: "~> 1.2.0",
+     elixir: "> 1.2.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: description,
@@ -47,9 +47,9 @@ defmodule PubnubEx.Mixfile do
   defp package do
     [
       files: ["lib", "mix.exs", "README*"],
-      maintainers: ["Ryuichi Maeno"],
+      maintainers: ["John Carbajal"],
       licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/ryuone/pubnub_ex"}
+      links: %{"Github" => "https://github.com/kantox/pubnub_ex"}
     ]
   end
 end

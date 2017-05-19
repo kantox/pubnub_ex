@@ -6,9 +6,9 @@ defmodule PubnubEx.Publish do
   def publish(channel, msg) do
     config = PubnubEx.Record.create_config(channel)
     url = get_url(config, msg)
-    Logger.info(url)
+    Logger.debug(url)
     {:ok, res} = HTTPoison.get(url, [], [timeout: :infinity, recv_timeout: :infinity])
-    Logger.info(inspect(res))
+    Logger.debug(inspect(res))
     %HTTPoison.Response{body: body, status_code: 200} = res
     timetoken = case JSX.decode(body) do
       {:ok, [1, "Sent", timetoken]} ->

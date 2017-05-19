@@ -16,13 +16,13 @@ defmodule PubnubEx.Subscribe do
   end
 
   def handle_cast(:start, sub_state(pid: pid, pubnub_config: pubnub_config)=state) do
-    Logger.info inspect(state)
+    Logger.debug inspect(state)
     spawn_result = spawn_monitor(__MODULE__, :request, [pubnub_config, pid, 0])
     state = PubnubEx.Record.set_monitor_client(state, spawn_result)
     {:noreply, state}
   end
   def handle_cast(msg, state) do
-    IO.puts "Unknow handle cast event."
+    Logger.warn "Unknow handle cast event."
     {:noreply, state}
   end
 
@@ -32,7 +32,7 @@ defmodule PubnubEx.Subscribe do
   end
 
   def handle_info(msg, sub_state(pid: pid) = state) do
-    IO.puts "Unknown handle info #{inspect(msg)}"
+    Logger.warn "Unknown handle info #{inspect(msg)}"
     {:noreply, state}
   end
 
@@ -42,10 +42,10 @@ defmodule PubnubEx.Subscribe do
 
   def request(pubnub_config()=config, pid, timetoken) do
     url = get_url(config, timetoken)
-    Logger.info url
+    Logger.debug url
     {:ok, res} = HTTPoison.get(url, [], [timeout: :infinity, recv_timeout: :infinity])
     %HTTPoison.Response{body: body, status_code: 200} = res
-    Logger.info inspect(body)
+    Logger.debug inspect(body)
     timetoken = case JSX.decode(body) do
       {:ok, [[], timetoken]} ->
         timetoken
