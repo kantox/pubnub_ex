@@ -17,7 +17,7 @@ defmodule PubnubEx.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :httpoison],
+      applications: [:logger, :httpoison, :poison],
       mod: {PubnubEx, []}
     ]
   end
@@ -33,8 +33,8 @@ defmodule PubnubEx.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "> 0.6.0" },
-      {:exjsx, "~> 3.2.0" }
+      {:httpoison, ">= 0.6.0" },
+      {:poison, "~> 3.0"}
     ]
   end
 

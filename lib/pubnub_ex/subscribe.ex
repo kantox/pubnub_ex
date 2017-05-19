@@ -46,13 +46,7 @@ defmodule PubnubEx.Subscribe do
     {:ok, res} = HTTPoison.get(url, [], [timeout: :infinity, recv_timeout: :infinity])
     %HTTPoison.Response{body: body, status_code: 200} = res
     Logger.debug inspect(body)
-    timetoken = case JSX.decode(body) do
-      {:ok, [[], timetoken]} ->
-        timetoken
-      {:ok, [[msg], timetoken]} ->
-        send(pid,msg)
-        timetoken
-    end
+    timetoken = Poison.decode!(body)
     request(config, pid, timetoken)
   end
 

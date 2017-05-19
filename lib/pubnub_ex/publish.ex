@@ -10,10 +10,7 @@ defmodule PubnubEx.Publish do
     {:ok, res} = HTTPoison.get(url, [], [timeout: :infinity, recv_timeout: :infinity])
     Logger.debug(inspect(res))
     %HTTPoison.Response{body: body, status_code: 200} = res
-    timetoken = case JSX.decode(body) do
-      {:ok, [1, "Sent", timetoken]} ->
-        timetoken
-    end
+    timetoken = Poison.decode!(body) 
     {:ok, timetoken}
   end
 
