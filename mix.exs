@@ -33,7 +33,7 @@ defmodule PubnubEx.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.8.1" },
+      {:httpoison, "> 0.6.0" },
       {:exjsx, "~> 3.2.0" }
     ]
   end
