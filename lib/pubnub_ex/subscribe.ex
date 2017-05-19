@@ -16,7 +16,6 @@ defmodule PubnubEx.Subscribe do
   end
 
   def handle_cast(:start, sub_state(pid: pid, pubnub_config: pubnub_config)=state) do
-    Logger.debug inspect(state)
     spawn_result = spawn_monitor(__MODULE__, :request, [pubnub_config, pid, 0])
     state = PubnubEx.Record.set_monitor_client(state, spawn_result)
     {:noreply, state}
@@ -42,10 +41,8 @@ defmodule PubnubEx.Subscribe do
 
   def request(pubnub_config()=config, pid, timetoken) do
     url = get_url(config, timetoken)
-    Logger.debug url
     {:ok, res} = HTTPoison.get(url, [], [timeout: :infinity, recv_timeout: :infinity])
     %HTTPoison.Response{body: body, status_code: 200} = res
-    Logger.debug inspect(body)
     timetoken = Poison.decode!(body)
     request(config, pid, timetoken)
   end
